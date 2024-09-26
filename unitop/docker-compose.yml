@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  test_crawl:
+    image: imagecrawler
+    container_name: test_crawl
+    networks: 
+      - mynetwork
+    depends_on:
+      - test_mongodb
+
+
+
+  test_mongodb:
+    image: mongo
+    container_name: test_mongodb
+    ports:
+      - "27017:27017"
+    networks: 
+      - mynetwork
+
+  spark-master:
+    image: bitnami/spark:latest
+    command: bin/spark-class org.apache.spark.deploy.master.Master
+    environment:
+      SPARK_SUBMIT_ARGS: --packages org.mongodb.spark:mongo-spark-connector_2.12:10.0.0 pyspark-shell
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+    networks:
+      - mynetwork
+
+  spark-worker:
+    image: bitnami/spark:latest
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MODE: worker
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_SUBMIT_ARGS: --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1 pyspark-shell
+    networks:
+      - mynetwork
+
+
+
+networks:
+  mynetwork:
+
+
