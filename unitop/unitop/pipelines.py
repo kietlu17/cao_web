@@ -17,7 +17,7 @@ class MongoDBUnitopPipeline:
         # Connection String
         
         #self.client = pymongo.MongoClient('mongodb://mymongodb:27017')
-        self.client = pymongo.MongoClient('mongodb://test_mongodb:27017')
+        self.client = pymongo.MongoClient('mongodb://root:rootpassword@mongo:27017')
         self.db = self.client['dbmycrawler'] #Create Database      
         pass
     
